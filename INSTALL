@@ -1,0 +1,1 @@
+git clone -b 'master' --single-branch --depth 1 https://github.com/MiguSchweiz/bashcast.git

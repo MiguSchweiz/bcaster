@@ -1,0 +1,117 @@
+#!/bin/bash
+exec 2>/dev/null
+
+#set -x
+conf=$HOME/.bashcastrc
+
+#create configfile if not existing
+if [ ! -f $conf ];then
+	echo "# config settings ">$conf
+	echo "downloadDir=$HOME/bashcast">>$conf
+	echo "cleanOld=true">>$conf
+	echo "playlist=$HOME/bashcast/playlist.m3u">>$conf
+	echo "id3tags=true">>$conf
+	echo "id3Jpg=true">>$conf
+	echo >>$conf
+	echo "# podcast urls">>$conf
+	echo >>$conf
+	echo
+	echo "created config file $conf, edit according to your needs"
+	echo
+	exit 1
+fi
+
+# read config params
+config=`cat $conf |egrep -v "http|#|^$|^ "`  
+for c in $config ;do
+	echo $c|grep "downloadDir=">/dev/null && downloadDir=`echo $c|sed -e 's/downloadDir=//'`>/dev/null
+	echo $c|grep "cleanOld=true">/dev/null && cleanOld=`echo $c|sed -e 's/cleanOld=//'`
+	echo $c|grep "playlist=">/dev/null && playlist=`echo $c|sed -e 's/playlist=//'`
+	echo $c|grep "id3tags=true">/dev/null && id3tags=`echo $c|sed -e 's/id3tags=//'`
+	echo $c|grep "id3Jpg=true">/dev/null && id3Jpg=`echo $c|sed -e 's/id3Jpg=//'`
+done
+
+# check config params
+if [ ! -d $downloadDir ];then
+	mkdir -p $downloadDir 
+	if [ $? -eq 1 ];then
+		echo "### Invalid downloadDir, check config"
+		err=1
+	fi
+fi
+if [ ! -f $playlist ]; then
+	echo /dev/null > $playlist
+	if [ $? -eq 1 ];then
+		echo "### Invalid playlist, check config"
+		err=1
+	fi
+fi
+[ ! -z $err ]&& exit 1
+
+
+# read rss urls
+urls=`cat $conf| egrep "^http"`
+id=-1
+for rss in $urls; do
+	echo
+	id=$((id+1))
+	curl $rss >/tmp/bc.tmp 
+	podCastTitle=`cat /tmp/bc.tmp|grep -o 'title>[^<]*'|grep -o '[^>]*$'|head -1`
+	if [ -z "$podCastTitle" ];then
+		echo "### Error downloading $rss"
+		continue
+	fi
+	echo "Podcast: $podCastTitle"
+	item=`cat /tmp/bc.tmp|grep -n "item" |head -1|awk -F':' '{print $1}'`
+	title=`sed -n $item,100p /tmp/bc.tmp | grep -o "title>[^<]*"|grep -o "[^>]*$"|head -1`
+	#file=`cat /tmp/bc.tmp|grep -i '<enclosure.*url='|awk -F'"' '{print $2}'|head -1`
+	file=`cat /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'http.*'|awk -F'"' '{print $1}'|head -1`
+	filename=$downloadDir"/"$id"_"`echo $file|grep -o '[^/]*$'|awk -F'?' '{print $1}'`
+	if [ ! -f $filename ];then
+		wget -O $filename $file
+		if [ $? -eq 1 ];then
+			echo "### Error downloading $file"
+			continue
+		else
+			if [ ! -z "id3tag" ];then
+				echo "Add id3Tag..."
+				eyeD3 -a "$podCastTitle"  -t "$title" $filename
+			fi
+			eyeD3 $filename |grep image>/dev/null
+			if [ $? -eq 1 ]&&[ ! -z "$id3Jpg" ];then
+				echo "Add id3 Image..."
+				img=`cat /tmp/bc.tmp |egrep "\.jpg|\.png|\.gif"|grep -o 'http[^<]*'|sed -e 's/".*//'|head -1`
+				wget -O /tmp/bc.jpg $img >/dev/null
+				if [ $? -eq 1 ];then
+					echo "### Error downloading Image"
+				else
+					eyeD3 --add-image="/tmp/bc.jpg":OTHER $filename
+				fi
+			fi
+			if [ ! -z "$cleanOld" ];then
+				#echo "delete old podcasts"
+				cd $downloadDir
+				ls -t $id"_*"|grep -v `ls -t $id"_*"|head -1`|xargs rm
+			fi
+		fi
+	else
+		if [ ! -z "$cleanOld" ];then
+			#echo "delete old podcasts"
+			cd $downloadDir
+			ls -t "$id"_*|grep -v `ls -t "$id"_*|head -1`|xargs rm
+		fi
+		continue
+	fi
+done
+
+# create playlist
+if [ -f $playlist ]; then
+	cd $downloadDir
+	files=`ls -t ?_*.???|grep -v m3u`
+	cat /dev/null > $playlist
+	for f in $files;do
+		echo $downloadDir/$f >>$playlist
+	done
+fi
+
+
