@@ -9,4 +9,30 @@ Simple bash based podcast downloader
 	* Option: create playlist with items in chronological order (new first)
 
 * dependencies:
-	* eye3d
+	* eyed3 (apt-get install eyed3)
+	* id3tag (apt-get install libid3-tools)
+
+
+* Install:
+	* git clone -b 'master' --single-branch --depth 1 https://github.com/MiguSchweiz/bashcast.git
+	* cd bashcast
+	* chmod 755 bashcast
+	* ./bashcast
+	* edit ~/.bcast according your needs
+	* ./bashacst
+	* add cronjob with crontab -e
+
+* Config example:
+
+# config settings 
+downloadDir=/mnt/usb0/podcasts
+cleanOld=true
+playlist=/mnt/usb0/podcasts/playlist.m3u
+id3tag=true
+id3Jpg=true
+
+# podcast urls
+http://www.cl-rec.com/pod/podcast
+http://drumcode.libsyn.com/rss
+http://syndicast.co.uk/distribution/show/rss/club-edition
+
