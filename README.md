@@ -23,16 +23,4 @@ Simple bash based podcast downloader
 	* add cronjob with crontab -e
 
 * Config example:
-
-# config settings 
-downloadDir=/mnt/usb0/podcasts
-cleanOld=true
-playlist=/mnt/usb0/podcasts/playlist.m3u
-id3tag=true
-id3Jpg=true
-
-# podcast urls
-http://www.cl-rec.com/pod/podcast
-http://drumcode.libsyn.com/rss
-http://syndicast.co.uk/distribution/show/rss/club-edition
-
+	* see file: config-example
