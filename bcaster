@@ -53,7 +53,7 @@ fi
 urls=`cat $conf| egrep "^http"`
 id=-1
 for rss in $urls; do
-	echo
+	#echo
 	id=$((id+1))
 	wget -O - $rss >/tmp/bc.tmp 
 	podCastTitle=`cat /tmp/bc.tmp|grep -o 'title>[^<]*'|grep -o '[^>]*$'|head -1|sed -e 's/\&amp;/\&/g'`
@@ -69,28 +69,31 @@ for rss in $urls; do
 	file=`cat /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'http.*'|awk -F'"' '{print $1}'|head -1`
 	filename=$downloadDir"/"$id"_"`echo $file|grep -o '[^/]*$'|awk -F'?' '{print $1}'`
 	if [ ! -f $filename ] || [ ! -z "$debug" ];then
+		echo "Downloading $file ..."
 		[ -z "$debug" ] && wget -O $filename $file||echo
 		if [ $? -eq 1 ];then
 			echo "### Error downloading $file"
 			continue
 		else
-			if [ ! -z "id3tag" ];then
+			[[ "$filename" == *mp3* ]] && isMp3=1
+			if [ ! -z "id3tag" ] && [ ! -z "$isMp3" ];then
 				echo "Add id3Tag..."
-				id3tag -a "$podCastTitle"  -s "$title" $filename
+				id3tag -a "$podCastTitle"  -s "$title" $filename|grep "++"
 			fi
-			eyeD3 $filename |grep image>/dev/null
-			if [ $? -eq 1 ]&&[ ! -z "$id3Jpg" ];then
+			#eyeD3 $filename |grep image>/dev/null
+			if [ ! -z "$id3Jpg" ]&& [ ! -z "$isMp3" ];then
 				echo "Add id3 Image..."
 				img=`cat /tmp/bc.tmp |egrep "\.jpg|\.png|\.gif"|grep -o 'http[^<]*'|sed -e 's/".*//'|head -1`
 				wget -O /tmp/bc.jpg $img >/dev/null
 				if [ $? -eq 1 ];then
 					echo "### Error downloading Image"
 				else
-					eyeD3 --add-image="/tmp/bc.jpg":OTHER $filename
+					eyeD3 --remove-all-images $filename
+					eyeD3 --add-image="/tmp/bc.jpg":OTHER $filename |grep "OTHER"
 				fi
 			fi
 			if [ ! -z "$cleanOld" ];then
-				#echo "delete old podcasts"
+				echo "delete old podcasts"
 				cd $downloadDir
 				ls -t $id"_*"|grep -v `ls -t $id"_*"|head -1`|xargs rm
 			fi
