@@ -1,4 +1,4 @@
-# bashcast
+# bcaster
 Simple bash based podcast downloader
 
 * Features:
