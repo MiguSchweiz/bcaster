@@ -14,7 +14,7 @@ Simple bash based podcast downloader
 
 
 * Install:
-	* git clone -b 'master' --single-branch --depth 1 https://github.com/MiguSchweiz/bashcast.git
+	* git clone -b 'master' --single-branch --depth 1 https://github.com/MiguSchweiz/bcaster.git
 	* cd bashcast
 	* chmod 755 bashcast
 	* ./bashcast
