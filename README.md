@@ -23,4 +23,4 @@ Simple bash based podcast downloader
 	* add cronjob with crontab -e
 
 * Config example:
-	* see file: config-example
+	* see file: [config-example](config-example)
