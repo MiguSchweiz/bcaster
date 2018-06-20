@@ -126,5 +126,7 @@ if [ -f $playlist ]; then
 		echo $downloadDir/$f >>$playlist
 	done
 fi
+curl -s --data-binary '{"jsonrpc": "2.0", "method": "AudioLibrary.clean", "id": "mybash"}' -H "content-type:application/json" -H 'content-type: application/json;' http://192.168.1.24:8080/jsonrpc
 
+#curl -s --data-binary '{"jsonrpc": "2.0", "method": "AudioLibrary.Scan", "id": "mybash"}' -H "content-type:application/json" -H 'content-type: application/json;' http://192.168.1.24:8080/jsonrpc
 
