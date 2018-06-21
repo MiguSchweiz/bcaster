@@ -9,8 +9,8 @@ Simple bash based podcast downloader
 	* Option: create playlist with items in chronological order (new first)
 
 * dependencies:
-	* eyed3 (apt-get install eyed3)
-	* id3tag (apt-get install libid3-tools)
+	* eyed3 (`sudo apt-get install eyed3`)
+	* id3tag (`sudo apt-get install libid3-tools`)
 
 
 * Install:
