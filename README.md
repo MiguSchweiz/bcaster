@@ -14,12 +14,12 @@ Simple bash based podcast downloader
 
 
 * Install:
-	* git clone -b 'master' --single-branch --depth 1 https://github.com/MiguSchweiz/bcaster.git
-	* cd bcaster
-	* chmod 755 bcaster
-	* ./bashcast
+	* `git clone -b 'master' --single-branch --depth 1 https://github.com/MiguSchweiz/bcaster.git`
+	* `cd bcaster`
+	* `chmod 755 bcaster`
+	* `./bashcast`
 	* edit ~/.bcast according your needs
-	* ./bcaster
+	* `./bcaster`
 	* add cronjob with crontab -e
 
 * Config example:
