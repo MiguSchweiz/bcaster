@@ -1,5 +1,5 @@
 #!/bin/bash
-#exec 2>/dev/null
+exec 2>/dev/null
 #debug=1
 #set -x
 conf=$HOME/.bcastrc
@@ -39,18 +39,23 @@ if [ ! -d $downloadDir ];then
 		err=1
 	fi
 fi
+
 if [ ! -f $playlist ]; then
-	echo /dev/null > $playlist
+	echo "# bcaster playlist" > $playlist
 	if [ $? -eq 1 ];then
-		echo "### Invalid playlist, check config"
-		err=1
+		echo "### Invalid playlist config, skipping creation"
 	fi
 fi
-[ ! -z $err ]&& exit 1
 
 
 # read rss urls
 urls=`cat $conf| egrep "^http"`
+[ -d "$2" ] && downloadDir=$2 && playlist="/tmp/pl.m3u"
+
+# check for params
+echo $1 |grep http
+[ $? -eq 0 ] && urls=`echo $1` 
+
 id=-1
 for rss in $urls; do
 	#echo
@@ -64,8 +69,18 @@ for rss in $urls; do
 	echo "Podcast: $podCastTitle"
 
 	# check newest bottom or top
-	top=`cat /tmp/bc.tmp | grep "<pubDate>"|head -1|grep -o '[0-9][0-9][0-9][0-9]'|head -1`
-	bot=`tac /tmp/bc.tmp | grep "<pubDate>"|head -1|grep -o '[0-9][0-9][0-9][0-9]'|head -1`
+	top=`cat /tmp/bc.tmp | grep -o '<pubDate>[^/]*'|grep -o '[0-9][0-9][0-9][0-9]'|head -1`
+	bot=`tac /tmp/bc.tmp | grep -o '<pubDate>[^/]*'|grep -o '[0-9][0-9][0-9][0-9]'|head -1`
+	if [ $bot -eq $top ];then
+		mon=`cat /tmp/bc.tmp | grep -o '<pubDate>[^/]*'|grep -o '[ ][A-Z][a-z][a-z]'|head -1|sed -e 's/ //'`
+		top=`date --date="$(printf "01 %s" $mon)" +"%m"`
+		mon=`tac /tmp/bc.tmp | grep -o '<pubDate>[^/]*'|grep -o '[ ][A-Z][a-z][a-z]'|head -1|sed -e 's/ //'`
+		bot=`date --date="$(printf "01 %s" $mon)" +"%m"`
+	fi
+	if [ $bot -eq $top ];then
+		top=`cat /tmp/bc.tmp | grep -o '<pubDate>[^/]*'|grep -o "[ ][0-9][0-9][ ]"|head -1|tr -d " "`
+		bot=`tac /tmp/bc.tmp | grep -o '<pubDate>[^/]*'|grep -o "[ ][0-9][0-9][ ]"|head -1|tr -d " "`
+	fi
 	if [ $top -ge $bot ];then
 		item=`cat /tmp/bc.tmp|grep -n "<item>" |head -1|awk -F':' '{print $1}'`
 		title=`sed -n $item,100p /tmp/bc.tmp | grep -o "<title>[^<]*"|grep -o "[^>]*$"|head -1|sed -e 's/\&amp;/\&/g'`
@@ -78,7 +93,7 @@ for rss in $urls; do
 	fi
 	filename=$downloadDir"/"$id"_"`echo $file|grep -o '[^/]*$'|awk -F'?' '{print $1}'`
 	if [ ! -f $filename ] ;then
-		echo "Downloading $file ..."
+		echo "Downloading $filename ..."
 		wget -O $filename $file||echo
 		if [ $? -eq 1 ];then
 			echo "### Error downloading $file"
@@ -93,6 +108,9 @@ for rss in $urls; do
 			if [ ! -z "$id3Jpg" ]&& [ ! -z "$isMp3" ];then
 				echo "Add id3 Image..."
 				img=`cat /tmp/bc.tmp |egrep "\.jpg|\.png|\.gif"|grep -o 'http[^<]*'|sed -e 's/".*//'|head -1`
+				echo $img|egrep "\.jpg$|\.png$|\.gif$"
+				[ $? -eq 1 ] && img=`cat /tmp/bc.tmp |egrep "\.jpg|\.png|\.gif"|grep -o 'http[^<]*'|sed -e 's/".*//'|egrep "\.jpg|\.png|\.gif"|head -1`
+				echo $img
 				wget -O /tmp/bc.jpg $img >/dev/null
 				if [ $? -eq 1 ];then
 					echo "### Error downloading Image"
@@ -125,8 +143,11 @@ if [ -f $playlist ]; then
 	for f in $files;do
 		echo $downloadDir/$f >>$playlist
 	done
+	echo "created playlist: $playlist"
 fi
+
+# refreh kodi db
 curl -s --data-binary '{"jsonrpc": "2.0", "method": "AudioLibrary.clean", "id": "mybash"}' -H "content-type:application/json" -H 'content-type: application/json;' http://192.168.1.24:8080/jsonrpc
-
-#curl -s --data-binary '{"jsonrpc": "2.0", "method": "AudioLibrary.Scan", "id": "mybash"}' -H "content-type:application/json" -H 'content-type: application/json;' http://192.168.1.24:8080/jsonrpc
-
+echo
+curl -s --data-binary '{"jsonrpc": "2.0", "method": "AudioLibrary.Scan", "id": "mybash"}' -H "content-type:application/json" -H 'content-type: application/json;' http://192.168.1.24:8080/jsonrpc
+echo
