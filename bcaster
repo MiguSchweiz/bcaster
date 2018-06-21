@@ -8,10 +8,10 @@ conf=$HOME/.bcastrc
 if [ ! -f $conf ];then
 	echo "# config settings ">$conf
 	echo "downloadDir=$HOME/bashcast">>$conf
-	echo "cleanOld=true">>$conf
-	echo "playlist=$HOME/bashcast/playlist.m3u">>$conf
+	echo "playlist=$HOME/bcaster.m3u">>$conf
 	echo "id3tags=true">>$conf
 	echo "id3Jpg=true">>$conf
+        echo "cleanOld=true">>$conf
 	echo >>$conf
 	echo "# podcast urls">>$conf
 	echo >>$conf
