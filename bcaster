@@ -92,9 +92,11 @@ for rss in $urls; do
 		file=`tac /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'http.*'|awk -F'"' '{print $1}'|head -1`
 	fi
 	filename=$downloadDir"/"$id"_"`echo $file|grep -o '[^/]*$'|awk -F'?' '{print $1}'`
+	echo $filename | egrep ".bin$"
+	[ $? -eq 0 ] && filename=$filename".mp3"
 	if [ ! -f $filename ] ;then
 		echo "Downloading $filename ..."
-		wget -O $filename $file||echo
+		wget -O $filename $file
 		if [ $? -eq 1 ];then
 			echo "### Error downloading $file"
 			continue
