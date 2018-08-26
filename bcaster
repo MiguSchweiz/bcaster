@@ -83,7 +83,7 @@ for rss in $urls; do
 	fi
 	if [ $top -ge $bot ];then
 		item=`cat /tmp/bc.tmp|grep -n "<item>" |head -1|awk -F':' '{print $1}'`
-		title=`sed -n $item,100p /tmp/bc.tmp | grep -o "<title>[^<]*"|grep -o "[^>]*$"|head -1|sed -e 's/\&amp;/\&/g'`
+		title=`sed -n $item,500p /tmp/bc.tmp | grep -o "<title>[^<]*"|grep -o "[^>]*$"|head -1|sed -e 's/\&amp;/\&/g'`
 		[[ "$title" == [A-Za-z0-9]* ]] || title=`sed -n $item,100p /tmp/bc.tmp | grep -o "title>[^]]*"|grep -o "[^[]*$"|head -1|sed -e 's/\&amp;/\&/g'`
 		file=`cat /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'http.*'|awk -F'"' '{print $1}'|head -1`
 	else
