@@ -6,7 +6,8 @@ id3tag=true
 id3Jpg=true
 
 # podcast urls
-http://www.cl-rec.com/pod/podcast
+#amfm
+http://daten.clr.net/pod/podcast
 http://drumcode.libsyn.com/rss
 http://syndicast.co.uk/distribution/show/rss/club-edition
 http://syndicast.co.uk/distribution/show/rss/transmissions
