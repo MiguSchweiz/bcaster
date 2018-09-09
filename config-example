@@ -15,7 +15,8 @@ http://www.sergiofernandez.com/emphasis/podcast.xml
 http://www.ferhatalbayrak.com/jetonradioshow/podcast.xml
 http://syndicast.co.uk/distribution/show/rss/felix-krocher-radioshow
 http://feeds.feedburner.com/InStereoRadioShow
-http://syndicast.co.uk/distribution/show/rss/eagle-sessions
+#http://syndicast.co.uk/distribution/show/rss/eagle-sessions
+https://syndicast.co.uk/distribution/show/rss/ballroom-records-radioshow
 http://syndicast.co.uk/distribution/show/rss/kd-music-radio-show
 http://syndicast.co.uk/distribution/show/rss/offcast
 # No Rafa No Party
@@ -57,5 +58,7 @@ http://feeds.soundcloud.com/users/soundcloud:users:62215098/sounds.rss
 http://feeds.soundcloud.com/users/soundcloud:users:5780/sounds.rss
 # struktur podcast
 http://feeds.soundcloud.com/users/soundcloud:users:21346102/sounds.rss
+# materia - marco baley
+http://feeds.soundcloud.com/users/soundcloud:users:384637/sounds.rss
 
 
