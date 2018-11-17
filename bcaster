@@ -85,12 +85,12 @@ for rss in $urls; do
 		item=`cat /tmp/bc.tmp|grep -n "<item>" |head -1|awk -F':' '{print $1}'`
 		title=`sed -n $item,500p /tmp/bc.tmp | grep -o "<title>[^<]*"|grep -o "[^>]*$"|head -1|sed -e 's/\&amp;/\&/g'`
 		[[ "$title" == [A-Za-z0-9]* ]] || title=`sed -n $item,100p /tmp/bc.tmp | grep -o "title>[^]]*"|grep -o "[^[]*$"|head -1|sed -e 's/\&amp;/\&/g'`
-		file=`cat /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'http.*'|awk -F'"' '{print $1}'|head -1`
+		file=`cat /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'url=.*'|awk -F'"' '{print $2}'|head -1`
 		link=`cat /tmp/bc.tmp|grep -o "link>[^]]*"|grep -o "http[^[]*mp3"|head -1`
 	else
 		title=`tac /tmp/bc.tmp | grep -o "<title>[^<]*"|grep -o "[^>]*$"|head -1|sed -e 's/\&amp;/\&/g'`
 		[[ "$title" == [A-Za-z0-9]* ]] || title=`tac /tmp/bc.tmp | grep -o "title>[^]]*"|grep -o "[^[]*$"|head -1|sed -e 's/\&amp;/\&/g'`
-		file=`tac /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'http.*'|awk -F'"' '{print $1}'|head -1`
+		file=`tac /tmp/bc.tmp|grep -i "<enclosure"|grep -o 'url=.*'|awk -F'"' '{print $2}'|head -1`
 		link=`cat /tmp/bc.tmp|grep -o "link>[^]]*"|grep -o "http[^[]*mp3"|head -1`
 	fi
 	echo $link|grep "\.mp3" && file=$link
